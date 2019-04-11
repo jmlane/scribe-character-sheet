@@ -1,11 +1,12 @@
 module Main exposing (main)
 
+import Browser exposing (document)
 import Html exposing (..)
 
 
-main : Program Never Model Msg
+main : Program () Model Msg
 main =
-    Html.program
+    Browser.element
         { init = init
         , update = update
         , subscriptions = subscriptions
@@ -13,8 +14,8 @@ main =
         }
 
 
-init : ( Model, Cmd Msg )
-init =
+init : () -> ( Model, Cmd Msg )
+init _ =
     ( { name = "Laura Sauer"
       , player = "Jon"
       , classes = [ ( "Paladin", 7 ) ]
@@ -94,22 +95,31 @@ view model =
             model.classes
                 |> List.map
                     (\( class, level ) ->
-                        "Level " ++ toString level ++ " " ++ class
+                        "Level " ++ String.fromInt level ++ " " ++ class
                     )
                 |> String.join ", "
+
+        inspiration : String
+        inspiration =
+            if model.inspiration then
+                "true"
+
+            else
+                "false"
     in
-        section []
-            [ h1 []
-                [ text model.name
-                , br [] []
-                , text subheader
-                ]
-            , p [] [ text ("Player: " ++ model.player) ]
-            , p [] [ text ("Race: " ++ model.race) ]
-            , p [] [ text ("Inspiration: " ++ toString model.inspiration) ]
-            , viewAttributes model.attributes
-            , viewSkills model.skills
+    section []
+        [ h1 []
+            [ text model.name
+            , br [] []
+            , text subheader
             ]
+        , p [] [ text ("Player: " ++ model.player) ]
+        , p [] [ text ("Race: " ++ model.race) ]
+        , p []
+            [ text ("Inspiration: " ++ inspiration) ]
+        , viewAttributes model.attributes
+        , viewSkills model.skills
+        ]
 
 
 viewAttributes : Attributes -> Html Msg
@@ -117,20 +127,20 @@ viewAttributes attributes =
     let
         mapToHtmlLi : ( String, Int ) -> Html Msg
         mapToHtmlLi ( attribute, value ) =
-            li [] [ text <| attribute ++ ": " ++ toString value ]
+            li [] [ text <| attribute ++ ": " ++ String.fromInt value ]
     in
-        section []
-            [ h2 [] [ text "Attributes" ]
-            , ul [] <|
-                List.map mapToHtmlLi <|
-                    [ ( "Strength", attributes.strength )
-                    , ( "Dexterity", attributes.dexterity )
-                    , ( "Constitution", attributes.constitution )
-                    , ( "Intelligence", attributes.intelligence )
-                    , ( "Wisdom", attributes.wisdom )
-                    , ( "Charisma", attributes.charisma )
-                    ]
-            ]
+    section []
+        [ h2 [] [ text "Attributes" ]
+        , ul [] <|
+            List.map mapToHtmlLi <|
+                [ ( "Strength", attributes.strength )
+                , ( "Dexterity", attributes.dexterity )
+                , ( "Constitution", attributes.constitution )
+                , ( "Intelligence", attributes.intelligence )
+                , ( "Wisdom", attributes.wisdom )
+                , ( "Charisma", attributes.charisma )
+                ]
+        ]
 
 
 viewSkills : Skills -> Html Msg
@@ -140,7 +150,6 @@ viewSkills skills =
         mapfunc name =
             li [] [ text name ]
     in
-        
     section []
         [ h2 [] [ text "Skills" ]
         , ul [] <|
