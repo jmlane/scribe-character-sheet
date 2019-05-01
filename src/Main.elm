@@ -32,6 +32,7 @@ type alias Model =
     , defenseRanged : Int
     , defenseMelee : Int
     , characteristics : Characteristics
+    , skills : Skills
     }
 
 
@@ -43,6 +44,10 @@ type alias Characteristics =
     , willpower : Int
     , presence : Int
     }
+
+
+type alias Skills =
+    List ( String, Int )
 
 
 type Archetype
@@ -70,7 +75,7 @@ toString archetype =
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( Model "" Nothing "" "" 0 0 0 0 0 0 0 (Characteristics 0 0 0 0 0 0)
+    ( Model "" Nothing "" "" 0 0 0 0 0 0 0 (Characteristics 0 0 0 0 0 0) []
     , Cmd.none
     )
 
@@ -109,6 +114,7 @@ view model =
         [ viewCharacterInfo model
         , viewDerivedAttributes model
         , viewCharacteristics model.characteristics
+        , viewSkills model.skills
         ]
 
 
@@ -165,4 +171,36 @@ viewCharacteristics characteristics =
         , labelledInput "Cunning" (String.fromInt characteristics.cunning)
         , labelledInput "Willpower" (String.fromInt characteristics.willpower)
         , labelledInput "Presence" (String.fromInt characteristics.presence)
+        ]
+
+
+viewSkills : Skills -> Html Msg
+viewSkills skills =
+    let
+        skillRow : ( String, Int ) -> Html Msg
+        skillRow ( name, rank ) =
+            tr []
+                [ td [] [ text name ]
+                , td []
+                    [ label []
+                        [ text (String.fromInt rank)
+                        , input [ type_ "radio" ] []
+                        ]
+                    ]
+                ]
+
+        skillTable =
+            List.map skillRow skills
+    in
+    section []
+        [ h2 [] [ text "Skills" ]
+        , table []
+            [ thead []
+                [ tr []
+                    [ th [] [ text "General Skills" ]
+                    , th [] [ text "Rank" ]
+                    ]
+                ]
+            , tbody [] skillTable
+            ]
         ]
